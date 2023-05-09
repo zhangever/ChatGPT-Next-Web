@@ -42,6 +42,9 @@ async function logReq(req: NextRequest) {
   const traceId = uuidv4();
 
   req.headers.set("traceId", traceId);
+  if (req.bodyUsed) {
+    req.body?.tee();
+  }
   // get request body
   const json = await req.json();
   console.log(
