@@ -39,15 +39,15 @@ async function logReq(req: NextRequest) {
   const traceId = uuidv4();
 
   req.headers.set("traceId", traceId);
-  if (req.bodyUsed) {
-    req.body?.tee();
-  }
+  // if (req.bodyUsed) {
+  //   req.body?.tee();
+  // }
   // get request body
-  const json = await req.json();
+  const bodyContent = await req.text();
   console.log(
     `[${currentTime}][${req.headers.get(
       "traceId",
-    )}}][${userIp}][Req]:${JSON.stringify(json.messages)}`,
+    )}}][${userIp}][Req]:${bodyContent}`,
   );
 }
 
@@ -57,7 +57,6 @@ async function createStream(res: Response, req: NextRequest) {
 
   const stream = new ReadableStream({
     async start(controller) {
-      const traceId = req.headers.get("traceId");
       let respContent = "";
 
       function onParse(event: any) {
@@ -67,6 +66,7 @@ async function createStream(res: Response, req: NextRequest) {
           if (data === "[DONE]") {
             controller.close();
             logReq(req);
+            const traceId = req.headers.get("traceId");
             console.log(`[${traceId}][Res]${respContent}`);
             return;
           }
