@@ -59,7 +59,6 @@ async function createStream(res: Response, req: NextRequest) {
     async start(controller) {
       const traceId = req.headers.get("traceId");
       let respContent = "";
-      logReq(req);
 
       function onParse(event: any) {
         if (event.type === "event") {
@@ -67,6 +66,7 @@ async function createStream(res: Response, req: NextRequest) {
           // https://beta.openai.com/docs/api-reference/completions/create#completions/create-stream
           if (data === "[DONE]") {
             controller.close();
+            logReq(req);
             console.log(`[${traceId}][Res]${respContent}`);
             return;
           }
