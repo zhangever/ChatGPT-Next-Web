@@ -2,6 +2,35 @@ import { NextRequest } from "next/server";
 import { getServerSideConfig } from "../config/server";
 import md5 from "spark-md5";
 import { ACCESS_CODE_PREFIX } from "../constant";
+import { v4 as uuidv4 } from "uuid";
+import moment from "moment";
+
+const IP_HEADERS = [
+  "Magiccube-Req-Ip",
+  "RemoteIp",
+  "X-Real-IP",
+  "X-Forwarded-For",
+  "Proxy-Client-IP",
+  "WL-Proxy-Client-IP",
+  "HTTP_CLIENT_IP",
+  "HTTP_X_FORWARDED_FOR",
+];
+
+function getIP(req: NextRequest) {
+  let ip = "";
+  for (const header of IP_HEADERS) {
+    ip = req.headers.get(header) ?? "";
+    if (ip) {
+      ip = ip.split(",").at(0) ?? "";
+      if (ip) {
+        console.log(`[IP] ${header}: ${ip}`);
+        break;
+      }
+    }
+  }
+
+  return ip;
+}
 
 const serverConfig = getServerSideConfig();
 
@@ -13,6 +42,22 @@ function parseApiKey(bearToken: string) {
     accessCode: isOpenAiKey ? "" : token.slice(ACCESS_CODE_PREFIX.length),
     apiKey: isOpenAiKey ? token : "",
   };
+}
+
+async function logReq(req: NextRequest) {
+  const userIp = getIP(req);
+  const currentTime = moment().format("YYYY-MM-DD HH:mm:ss");
+
+  const traceId = uuidv4();
+
+  req.headers.set("traceId", traceId);
+  req.json().then((json) => {
+    console.log(
+      `[${currentTime}][${req.headers.get(
+        "traceId",
+      )}}][${userIp}][Req]:${json}`,
+    );
+  });
 }
 
 export function auth(req: NextRequest) {
