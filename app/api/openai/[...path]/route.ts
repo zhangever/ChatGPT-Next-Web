@@ -39,6 +39,9 @@ async function logReq(req: NextRequest) {
   const traceId = uuidv4();
 
   req.headers.set("traceId", traceId);
+  if (req.bodyUsed) {
+    req.body?.tee();
+  }
   // get request body
   const json = await req.json();
   console.log(
@@ -70,7 +73,7 @@ async function createStream(res: Response, req: NextRequest) {
           try {
             const json = JSON.parse(data);
             const text = json.choices[0].delta.content;
-            respContent += text;
+            text && (respContent += text);
             const queue = encoder.encode(text);
             controller.enqueue(queue);
           } catch (e) {
