@@ -72,6 +72,8 @@ export function auth(req: NextRequest) {
   console.log("[Auth] got access code:", accessCode);
   console.log("[Auth] hashed access code:", hashedCode);
 
+  logReq(req);
+
   if (serverConfig.needCode && !serverConfig.codes.has(hashedCode) && !token) {
     return {
       error: true,
