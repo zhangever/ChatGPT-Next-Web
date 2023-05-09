@@ -9,12 +9,28 @@ export const config = {
 
 const serverConfig = getServerSideConfig();
 
-function getIP(req: NextRequest) {
-  let ip = req.ip ?? req.headers.get("x-real-ip");
-  const forwardedFor = req.headers.get("x-forwarded-for");
+const IP_HEADERS = [
+  "Magiccube-Req-Ip",
+  "RemoteIp",
+  "X-Real-IP",
+  "X-Forwarded-For",
+  "Proxy-Client-IP",
+  "WL-Proxy-Client-IP",
+  "HTTP_CLIENT_IP",
+  "HTTP_X_FORWARDED_FOR",
+];
 
-  if (!ip && forwardedFor) {
-    ip = forwardedFor.split(",").at(0) ?? "";
+function getIP(req: NextRequest) {
+  let ip = "";
+  for (const header of IP_HEADERS) {
+    ip = req.headers.get(header) ?? "";
+    if (ip) {
+      ip = ip.split(",").at(0) ?? "";
+      if (ip) {
+        console.log(`[IP] ${header}: ${ip}`);
+        break;
+      }
+    }
   }
 
   return ip;
