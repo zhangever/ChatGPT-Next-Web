@@ -42,9 +42,9 @@ export async function middleware(req: NextRequest) {
   req.headers.set("traceId", traceId);
 
 
-  const json = await req.json();
-  console.log(`[${req.headers.get("traceId")}}][${getIP(req)}][Req]${JSON.stringify(json.messages)}`);
-
+  req.json().then((json) => {
+    console.log(`[${req.headers.get("traceId")}}][${getIP(req)}][Req]${JSON.stringify(json.messages)}`);
+  });
 
   return NextResponse.next({
     request: {
