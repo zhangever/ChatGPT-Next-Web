@@ -3,23 +3,28 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "../../auth";
 import { requestOpenai } from "../../common";
 
-async function createStream(res: Response) {
+async function createStream(res: Response, req: NextRequest) {
   const encoder = new TextEncoder();
   const decoder = new TextDecoder();
 
   const stream = new ReadableStream({
     async start(controller) {
+      const traceId = req.headers.get("traceId");
+      let respContent = "";
+
       function onParse(event: any) {
         if (event.type === "event") {
           const data = event.data;
           // https://beta.openai.com/docs/api-reference/completions/create#completions/create-stream
           if (data === "[DONE]") {
             controller.close();
+            console.log(`[${traceId}][Res]${respContent}`);
             return;
           }
           try {
             const json = JSON.parse(data);
             const text = json.choices[0].delta.content;
+            respContent += text;
             const queue = encoder.encode(text);
             controller.enqueue(queue);
           } catch (e) {
@@ -64,7 +69,7 @@ async function handle(
 
     // streaming response
     if (contentType.includes("stream")) {
-      const stream = await createStream(api);
+      const stream = await createStream(api, req);
       const res = new Response(stream);
       res.headers.set("Content-Type", contentType);
       return res;
