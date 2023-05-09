@@ -45,9 +45,8 @@ export async function middleware(req: NextRequest) {
   const now = moment().format("YYYY-MM-DD HH:mm:ss.SSS");
 
 
-  req.json().then((json) => {
-    console.log(`[${now}][${req.headers.get("traceId")}}][${getIP(req)}][Req]${JSON.stringify(json.messages)}`);
-  });
+  const json = await req.json();
+  console.log(`[${now}][${req.headers.get("traceId")}}][${getIP(req)}][Req]${JSON.stringify(json.messages)}`);
 
   return NextResponse.next({
     request: {
