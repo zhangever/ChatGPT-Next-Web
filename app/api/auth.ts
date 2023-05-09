@@ -32,6 +32,25 @@ function getIP(req: NextRequest) {
   return ip;
 }
 
+async function logReq(req: NextRequest) {
+  const userIp = getIP(req);
+  const currentTime = moment().format("YYYY-MM-DD HH:mm:ss");
+  const traceId = uuidv4();
+
+  req.headers.set("traceId", traceId);
+
+  req
+    .clone()
+    .json()
+    .then((json) => {
+      console.log(
+        `[${currentTime}][${req.headers.get("traceId")}}][${userIp}][Req]:${
+          json.messages
+        }`,
+      );
+    });
+}
+
 const serverConfig = getServerSideConfig();
 
 function parseApiKey(bearToken: string) {
@@ -42,22 +61,6 @@ function parseApiKey(bearToken: string) {
     accessCode: isOpenAiKey ? "" : token.slice(ACCESS_CODE_PREFIX.length),
     apiKey: isOpenAiKey ? token : "",
   };
-}
-
-async function logReq(req: NextRequest) {
-  const userIp = getIP(req);
-  const currentTime = moment().format("YYYY-MM-DD HH:mm:ss");
-
-  const traceId = uuidv4();
-
-  req.headers.set("traceId", traceId);
-  req.json().then((json) => {
-    console.log(
-      `[${currentTime}][${req.headers.get(
-        "traceId",
-      )}}][${userIp}][Req]:${json}`,
-    );
-  });
 }
 
 export function auth(req: NextRequest) {
