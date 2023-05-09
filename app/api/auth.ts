@@ -2,15 +2,33 @@ import { NextRequest } from "next/server";
 import { getServerSideConfig } from "../config/server";
 import md5 from "spark-md5";
 import { ACCESS_CODE_PREFIX } from "../constant";
+import { v4 as uuidv4 } from "uuid";
+import moment from "moment";
 
 const serverConfig = getServerSideConfig();
 
-function getIP(req: NextRequest) {
-  let ip = req.ip ?? req.headers.get("x-real-ip");
-  const forwardedFor = req.headers.get("x-forwarded-for");
+const IP_HEADERS = [
+  "Magiccube-Req-Ip",
+  "RemoteIp",
+  "X-Real-IP",
+  "X-Forwarded-For",
+  "Proxy-Client-IP",
+  "WL-Proxy-Client-IP",
+  "HTTP_CLIENT_IP",
+  "HTTP_X_FORWARDED_FOR",
+];
 
-  if (!ip && forwardedFor) {
-    ip = forwardedFor.split(",").at(0) ?? "";
+function getIP(req: NextRequest) {
+  let ip = "";
+  for (const header of IP_HEADERS) {
+    ip = req.headers.get(header) ?? "";
+    if (ip) {
+      ip = ip.split(",").at(0) ?? "";
+      if (ip) {
+        console.log(`[IP] ${header}: ${ip}`);
+        break;
+      }
+    }
   }
 
   return ip;
@@ -26,6 +44,22 @@ function parseApiKey(bearToken: string) {
   };
 }
 
+async function logReq(req: NextRequest) {
+  const userIp = getIP(req);
+  const currentTime = moment().format("YYYY-MM-DD HH:mm:ss");
+
+  const traceId = uuidv4();
+
+  req.headers.set("traceId", traceId);
+  // get request body
+  const json = await req.json();
+  console.log(
+    `[${currentTime}][${req.headers.get(
+      "traceId",
+    )}}][${userIp}][Req]:${JSON.stringify(json.messages)}`,
+  );
+}
+
 export function auth(req: NextRequest) {
   const authToken = req.headers.get("Authorization") ?? "";
 
@@ -34,11 +68,11 @@ export function auth(req: NextRequest) {
 
   const hashedCode = md5.hash(accessCode ?? "").trim();
 
+  logReq(req);
+
   console.log("[Auth] allowed hashed codes: ", [...serverConfig.codes]);
   console.log("[Auth] got access code:", accessCode);
   console.log("[Auth] hashed access code:", hashedCode);
-  console.log("[User IP] ", getIP(req));
-  console.log("[Time] ", new Date().toLocaleString());
 
   if (serverConfig.needCode && !serverConfig.codes.has(hashedCode) && !token) {
     return {
