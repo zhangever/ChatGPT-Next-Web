@@ -5,6 +5,51 @@ import { prettyObject } from "@/app/utils/format";
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "../../auth";
 import { requestOpenai } from "../../common";
+import { v4 as uuidv4 } from "uuid";
+import moment from "moment";
+
+const IP_HEADERS = [
+  "Magiccube-Req-Ip",
+  "RemoteIp",
+  "X-Real-IP",
+  "X-Forwarded-For",
+  "Proxy-Client-IP",
+  "WL-Proxy-Client-IP",
+  "HTTP_CLIENT_IP",
+  "HTTP_X_FORWARDED_FOR",
+];
+
+function getIP(req: NextRequest) {
+  let ip = "";
+  for (const header of IP_HEADERS) {
+    ip = req.headers.get(header) ?? "";
+    if (ip) {
+      ip = ip.split(",").at(0) ?? "";
+      if (ip) {
+        console.log(`[IP] ${header}: ${ip}`);
+        break;
+      }
+    }
+  }
+
+  return ip;
+}
+
+async function logReq(req: NextRequest) {
+  const userIp = getIP(req);
+  const currentTime = moment().format("YYYY-MM-DD HH:mm:ss");
+
+  const traceId = uuidv4();
+
+  req.headers.set("traceId", traceId);
+  // get request body
+  const json = await req.json();
+  console.log(
+    `[${currentTime}][${req.headers.get(
+      "traceId",
+    )}}][${userIp}][Req]:${JSON.stringify(json.messages)}`,
+  );
+}
 
 const ALLOWD_PATH = new Set(Object.values(OpenaiPath));
 
