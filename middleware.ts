@@ -4,7 +4,7 @@ import md5 from "spark-md5";
 import { v4 as uuidv4 } from "uuid";
 
 export const config = {
-  matcher: ["/api/openai", "/api/chat-stream"],
+  matcher: ["/api/openai", "/api/openai/v1/chat/completions"],
 };
 
 const serverConfig = getServerSideConfig();

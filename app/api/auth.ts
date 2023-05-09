@@ -44,9 +44,9 @@ async function logReq(req: NextRequest) {
     .json()
     .then((json) => {
       console.log(
-        `[${currentTime}][${req.headers.get("traceId")}}][${userIp}][Req]:${
-          json.messages
-        }`,
+        `[${currentTime}][${req.headers.get(
+          "traceId",
+        )}}][${userIp}][Req]:${JSON.stringify(json.messages)}`,
       );
     });
 }
@@ -75,7 +75,7 @@ export function auth(req: NextRequest) {
   console.log("[Auth] got access code:", accessCode);
   console.log("[Auth] hashed access code:", hashedCode);
 
-  logReq(req);
+  // logReq(req);
 
   if (serverConfig.needCode && !serverConfig.codes.has(hashedCode) && !token) {
     return {
