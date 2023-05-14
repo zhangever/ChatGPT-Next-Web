@@ -2,6 +2,7 @@ import { createParser } from "eventsource-parser";
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "../../auth";
 import { requestOpenai } from "../../common";
+import moment from "moment-timezone";
 
 async function createStream(res: Response, req: NextRequest) {
   const encoder = new TextEncoder();
@@ -18,7 +19,19 @@ async function createStream(res: Response, req: NextRequest) {
           if (data === "[DONE]") {
             controller.close();
             const traceId = req.headers.get("traceId");
-            console.log(`[${traceId}][Res]${respContent}`);
+            const reqTime = req.headers.get("reqTime");
+            const currentTime = moment()
+              .tz("Asia/Shanghai")
+              .format("YYYY-MM-DD HH:mm:ss.SSS");
+            const timeDiff = moment(currentTime).diff(
+              moment(reqTime),
+              "milliseconds",
+              true,
+            );
+
+            console.log(
+              `[currentTime][${traceId}][cost]${timeDiff}[Res]${respContent}`,
+            );
             return;
           }
           try {
