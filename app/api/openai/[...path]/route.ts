@@ -30,7 +30,7 @@ async function createStream(res: Response, req: NextRequest) {
             );
 
             console.log(
-              `[currentTime][${traceId}][cost]${timeDiff}[Res]${respContent}`,
+              `[${currentTime}][${traceId}][costTime]${timeDiff}[Res]${respContent}`,
             );
             return;
           }
