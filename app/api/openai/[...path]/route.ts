@@ -11,15 +11,15 @@ async function createStream(res: Response, req: NextRequest) {
   const stream = new ReadableStream({
     async start(controller) {
       let respContent = "";
-
+      const traceId = req.headers.get("traceId");
+      const reqTime = req.headers.get("reqTime");
       function onParse(event: any) {
         if (event.type === "event") {
           const data = event.data;
           // https://beta.openai.com/docs/api-reference/completions/create#completions/create-stream
           if (data === "[DONE]") {
             controller.close();
-            const traceId = req.headers.get("traceId");
-            const reqTime = req.headers.get("reqTime");
+
             const currentTime = moment()
               .tz("Asia/Shanghai")
               .format("YYYY-MM-DD HH:mm:ss.SSS");
