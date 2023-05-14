@@ -39,14 +39,12 @@ function getIP(req: NextRequest) {
 }
 
 export async function middleware(req: NextRequest) {
-
   const traceId = uuidv4();
   req.headers.set("traceId", traceId);
   const now = moment().tz('Asia/Shanghai').format('YYYY-MM-DD HH:mm:ss.SSS');
-
-
   const json = await req.json();
   req.headers.set("reqTime", now);
+  
   console.log(`[${now}][${req.headers.get("traceId")}}][${getIP(req)}][Req]${JSON.stringify(json.messages)}`);
 
   return NextResponse.next({
