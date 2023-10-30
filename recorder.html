@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta name="apple-mobile-web-capable" content="yes">
+    <title>录音并传递给后台</title>
+    <script src="main.js" type="text/javascript"></script>
+</head>
+<body>
+<button id="intercomBegin">开始录音</button>
+<button id="intercomEnd">停止录音</button>
+</body>
+<script type="text/javascript">
+
+    const begin = document.getElementById('intercomBegin');
+    const end = document.getElementById('intercomEnd');
+
+    /*
+    * 开始对讲
+    */
+    begin.onclick = initAudio;
+
+    /*
+    * 关闭对讲
+    */
+    end.onclick = stop;
+</script>
+</html>
+
