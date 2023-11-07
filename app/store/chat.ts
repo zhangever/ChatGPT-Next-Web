@@ -116,11 +116,17 @@ function countMessages(msgs: ChatMessage[]) {
 }
 
 function fillTemplateWith(input: string, modelConfig: ModelConfig) {
+  const model = modelConfig.model;
+  let endDate = "2021-09";
+  if (model.startsWith("gpt-4-1106")) {
+    endDate = "2023-04";
+  }
   const vars = {
-    model: modelConfig.model,
+    model: model,
     time: new Date().toLocaleString(),
     lang: getLang(),
     input: input,
+    endDate: endDate,
   };
 
   let output = modelConfig.template ?? DEFAULT_INPUT_TEMPLATE;
