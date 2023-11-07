@@ -106,15 +106,15 @@ export const DEFAULT_MODELS = [
   },
   {
     name: "gpt-3.5-turbo",
-    available: true,
+    available: false,
   },
   {
     name: "gpt-3.5-turbo-0301",
-    available: true,
+    available: false,
   },
   {
     name: "gpt-3.5-turbo-0613",
-    available: true,
+    available: false,
   },
   {
     name: "gpt-3.5-turbo-16k",
@@ -122,7 +122,7 @@ export const DEFAULT_MODELS = [
   },
   {
     name: "gpt-3.5-turbo-16k-0613",
-    available: true,
+    available: false,
   },
 ] as const;
 
