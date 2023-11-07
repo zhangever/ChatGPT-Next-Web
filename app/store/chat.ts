@@ -118,7 +118,7 @@ function countMessages(msgs: ChatMessage[]) {
 function fillTemplateWith(input: string, modelConfig: ModelConfig) {
   let model = modelConfig.model;
   let endDate = "2021-09";
-  // use new models
+  // todo: added by ever, use new models
   if (model.startsWith("gpt-4")) {
     model = "gpt-4-1106-preview";
     endDate = "2023-04";
