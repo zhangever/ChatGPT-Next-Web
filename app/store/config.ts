@@ -112,7 +112,8 @@ export const useAppConfig = createPersistStore(
 
       const oldModels = get().models;
       const modelMap: Record<string, LLMModel> = {};
-
+      console.log("oldModels:", oldModels);
+      console.log("newModels:", newModels);
       for (const model of oldModels) {
         // modify by ever
         // model.available = false;
