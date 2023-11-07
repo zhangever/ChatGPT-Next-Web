@@ -187,6 +187,15 @@ export class ChatGPTApi implements LLMApi {
     }
   }
   async usage() {
+    // added by ever
+    // just ingore
+    let ignore = true;
+    if (ignore) {
+      return {
+        used: 0,
+        total: 0,
+      } as LLMUsage;
+    }
     const formatDate = (d: Date) =>
       `${d.getFullYear()}-${(d.getMonth() + 1).toString().padStart(2, "0")}-${d
         .getDate()

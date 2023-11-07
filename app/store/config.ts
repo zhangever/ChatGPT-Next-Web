@@ -119,6 +119,10 @@ export const useAppConfig = createPersistStore(
       }
 
       for (const model of newModels) {
+        // added by ever
+        if (model.name.startsWith("gpt-4")) {
+          continue;
+        }
         model.available = true;
         modelMap[model.name] = model;
       }
