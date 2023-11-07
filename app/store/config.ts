@@ -112,20 +112,13 @@ export const useAppConfig = createPersistStore(
 
       const oldModels = get().models;
       const modelMap: Record<string, LLMModel> = {};
-      console.log("oldModels:", oldModels);
-      console.log("newModels:", newModels);
+
       for (const model of oldModels) {
-        // modify by ever
-        // model.available = false;
+        model.available = false;
         modelMap[model.name] = model;
       }
 
       for (const model of newModels) {
-        // added by ever
-        if (model.name.startsWith("gpt-4")) {
-          continue;
-        }
-        model.available = true;
         modelMap[model.name] = model;
       }
 
