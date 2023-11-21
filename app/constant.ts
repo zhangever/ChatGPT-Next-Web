@@ -84,6 +84,10 @@ export const DEFAULT_MODELS = [
     name: "gpt-3.5-turbo-16k",
     available: true,
   },
+  {
+    name: "gpt-3.5-turbo",
+    available: false,
+  },
 ] as const;
 
 export const CHAT_PAGE_SIZE = 15;
