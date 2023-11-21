@@ -94,11 +94,11 @@ function fillTemplateWith(input: string, modelConfig: ModelConfig) {
     KnowledgeCutOffDate[modelConfig.model] ?? KnowledgeCutOffDate.default;
 
   const vars = {
+    cutoff,
     model: modelConfig.model,
     time: new Date().toLocaleString(),
     lang: getLang(),
     input: input,
-    endDate: cutoff,
   };
 
   let output = modelConfig.template ?? DEFAULT_INPUT_TEMPLATE;
