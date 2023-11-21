@@ -7,6 +7,7 @@ import { createEmptyMask, Mask } from "./mask";
 import {
   DEFAULT_INPUT_TEMPLATE,
   DEFAULT_SYSTEM_TEMPLATE,
+  KnowledgeCutOffDate,
   StoreKey,
   SUMMARIZE_MODEL,
 } from "../constant";
@@ -84,51 +85,20 @@ function getSummarizeModel(currentModel: string) {
   return currentModel.startsWith("gpt") ? SUMMARIZE_MODEL : currentModel;
 }
 
-interface ChatStore {
-  sessions: ChatSession[];
-  currentSessionIndex: number;
-  clearSessions: () => void;
-  moveSession: (from: number, to: number) => void;
-  selectSession: (index: number) => void;
-  newSession: (mask?: Mask) => void;
-  deleteSession: (index: number) => void;
-  currentSession: () => ChatSession;
-  nextSession: (delta: number) => void;
-  onNewMessage: (message: ChatMessage) => void;
-  onUserInput: (content: string) => Promise<void>;
-  summarizeSession: () => void;
-  updateStat: (message: ChatMessage) => void;
-  updateCurrentSession: (updater: (session: ChatSession) => void) => void;
-  updateMessage: (
-    sessionIndex: number,
-    messageIndex: number,
-    updater: (message?: ChatMessage) => void,
-  ) => void;
-  resetSession: () => void;
-  getMessagesWithMemory: () => ChatMessage[];
-  getMemoryPrompt: () => ChatMessage;
-
-  clearAllData: () => void;
-}
-
 function countMessages(msgs: ChatMessage[]) {
   return msgs.reduce((pre, cur) => pre + estimateTokenLength(cur.content), 0);
 }
 
 function fillTemplateWith(input: string, modelConfig: ModelConfig) {
-  let model = modelConfig.model;
-  let endDate = "2021-09";
-  // todo: added by ever, use new models
-  if (model.startsWith("gpt-4")) {
-    model = "gpt-4-1106-preview";
-    endDate = "2023-04";
-  }
+  let cutoff =
+    KnowledgeCutOffDate[modelConfig.model] ?? KnowledgeCutOffDate.default;
+
   const vars = {
-    model: model,
+    model: modelConfig.model,
     time: new Date().toLocaleString(),
     lang: getLang(),
     input: input,
-    endDate: endDate,
+    endDate: cutoff,
   };
 
   let output = modelConfig.template ?? DEFAULT_INPUT_TEMPLATE;
