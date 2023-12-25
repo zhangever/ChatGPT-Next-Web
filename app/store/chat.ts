@@ -477,8 +477,8 @@ export const useChatStore = createPersistStore(
         // remove error messages if any
         const messages = session.messages;
 
-        // should summarize topic after chating more than 50 words
-        const SUMMARIZE_MIN_LEN = 3096;
+        // should summarize topic after chating more than 100 words
+        const SUMMARIZE_MIN_LEN = 100;
         if (
           config.enableAutoGenerateTitle &&
           session.topic === DEFAULT_TOPIC &&
